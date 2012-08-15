@@ -970,7 +970,7 @@ public final class DirectotyContentProtos {
       
       public org.es.network.DirectotyContentProtos.ProtoDirContent buildPartial() {
         org.es.network.DirectotyContentProtos.ProtoDirContent result = new org.es.network.DirectotyContentProtos.ProtoDirContent(this);
-        int from_bitField0_ = bitField0_;
+//        int from_bitField0_ = bitField0_;
         if (fileBuilder_ == null) {
           if (((bitField0_ & 0x00000001) == 0x00000001)) {
             file_ = java.util.Collections.unmodifiableList(file_);
