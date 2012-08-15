@@ -1,5 +1,8 @@
 package org.es.network;
 
+import static org.es.network.ServerMessage.RC_ERROR;
+import static org.es.network.ServerMessage.RC_SUCCES;
+
 public class NetworkResponse extends NetworkMessage {
 
 	protected String mMessage;
@@ -7,10 +10,17 @@ public class NetworkResponse extends NetworkMessage {
 	protected String mErrorMessage;
 
 	public NetworkResponse() {
-		mReturnCode = ServerMessage.RC_SUCCES;
+		mReturnCode = RC_SUCCES;
+		mMessage = "";
+		mErrorMessage = "";
 	}
 
+	@Override
 	public String getMessage() {
+
+		if (RC_ERROR.equals(mReturnCode)) {
+			return mErrorMessage;
+		}
 		return mMessage;
 	}
 

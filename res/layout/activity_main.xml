@@ -1,61 +1,80 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	android:orientation="vertical" >
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
 
-	<TextView
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:text="@string/host_ip_address" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/host_ip_address" />
 
-	<EditText
-		android:id="@+id/etIpAddress"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:inputType="text"
-		android:text="@string/default_host_ip_address" />
+    <EditText
+        android:id="@+id/etIpAddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:text="@string/default_host_ip_address" />
 
-	<TextView
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:text="@string/host_port" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/host_port" />
 
-	<EditText
-		android:id="@+id/etPort"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:inputType="number"
-		android:text="@string/default_host_port" />
+    <EditText
+        android:id="@+id/etPort"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:text="@string/default_host_port" />
 
-	<EditText
-		android:id="@+id/etConsole"
-		android:layout_width="match_parent"
-		android:layout_height="0dp"
-		android:layout_weight="1"
-		android:ems="10"
-		android:inputType="textMultiLine" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/connection_timeout" />
 
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:gravity="bottom" >
+    <EditText
+        android:id="@+id/etTimeout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:text="@string/default_connection_timeout" />
 
-		<EditText
-			android:id="@+id/etTextToSend"
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_weight="1"
-			android:inputType="text" >
+    <EditText
+        android:id="@+id/etConsole"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:ems="10"
+        android:focusable="false"
+        android:inputType="textMultiLine" />
 
-			<requestFocus />
-		</EditText>
+    <Button
+        android:id="@+id/btnHello"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_hello" />
 
-		<Button
-			android:id="@+id/btnSend"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@android:string/ok" />
-	</LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom" >
+
+        <EditText
+            android:id="@+id/etTextToSend"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:inputType="text" >
+
+            <requestFocus />
+        </EditText>
+
+        <Button
+            android:id="@+id/btnSend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_send" />
+    </LinearLayout>
 
 </LinearLayout>

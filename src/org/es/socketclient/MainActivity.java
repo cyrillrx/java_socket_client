@@ -1,19 +1,20 @@
 package org.es.socketclient;
 
 import static android.view.HapticFeedbackConstants.VIRTUAL_KEY;
+import static android.widget.Toast.LENGTH_SHORT;
 import static org.es.socketclient.Constants.MESSAGE_WHAT_TOAST;
 
 import org.es.network.AsyncMessageMgr;
-import org.es.network.DirectotyContentProtos.ProtoDirContent;
-import org.es.network.DirectotyContentProtos.ProtoFile;
-import org.es.network.DirectotyContentProtos.ProtoFile.FileType;
-import org.es.network.NetworkMessage;
+import org.es.network.ServerRequestProtos.ProtoRequestKeyboard;
+import org.es.network.ServerRequestProtos.ProtoRequestKeyboard.KeyboardEvent;
+import org.es.network.ServerRequestProtos.ProtoRequestSimple;
+import org.es.network.ServerRequestProtos.ProtoRequestSimple.SimpleParam;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -23,21 +24,23 @@ import android.widget.Toast;
 
 /**
  * Home activity of the SocketClient application.
+ * 
  * @author Cyril Leroux
- *
+ * 
  */
-@SuppressLint("ParserError")
 public class MainActivity extends Activity implements OnClickListener {
+	private static final String TAG = "SocketClient_MainActivity";
 
 	/** Handle the toast messages. */
-	private Handler sToastHandler =	new Handler() {
+	private final Handler mToastHandler = new Handler() {
 		@Override
 		public void handleMessage(Message _msg) {
 			switch (_msg.what) {
 			case MESSAGE_WHAT_TOAST:
-				Toast.makeText(getApplicationContext(), (String)_msg.obj, Toast.LENGTH_SHORT).show();
+				sendToast((String) _msg.obj);
 				break;
-			default : break;
+			default:
+				break;
 			}
 			super.handleMessage(_msg);
 		}
@@ -49,6 +52,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		((Button) findViewById(R.id.btnHello)).setOnClickListener(this);
 		((Button) findViewById(R.id.btnSend)).setOnClickListener(this);
 	}
 
@@ -63,43 +67,98 @@ public class MainActivity extends Activity implements OnClickListener {
 		_v.performHapticFeedback(VIRTUAL_KEY);
 
 		switch (_v.getId()) {
-		case R.id.btnSend:
+		case R.id.btnHello:
 
-			ProtoFile.Builder fileBuilder = ProtoFile.newBuilder()
-			.setName("DevTools")
-			.setPath("c:")
-			.setType(FileType.FILE)
-			.setSize(10000);
-			ProtoDirContent.Builder dirContentBuilder = ProtoDirContent.newBuilder().addFile(fileBuilder);
+			ProtoRequestSimple simpleRequest = ProtoRequestSimple.newBuilder()
+			.setParam(SimpleParam.HELLO)
+			.build();
 
-			ProtoDirContent dirContent = dirContentBuilder.build();
-
-			if (dirContent.isInitialized()) {
-				Toast.makeText(getApplicationContext(), "is initialized", Toast.LENGTH_SHORT).show();
+			if (simpleRequest.isInitialized()) {
+				sendAsyncMessage(simpleRequest.toString());
 			} else {
-				Toast.makeText(getApplicationContext(), "is NOT initialized", Toast.LENGTH_SHORT).show();
+				sendToast("is NOT initialized");
 			}
 
-			((EditText) findViewById(R.id.etConsole)).setText(dirContent.toString());
+			break;
+
+		case R.id.btnSend:
+
+			ProtoRequestKeyboard keyboardRequest = ProtoRequestKeyboard.newBuilder()
+			.setEvent(KeyboardEvent.DEFINE)
+			.setText(getTextToSend())
+			.build();
+
+			if (keyboardRequest.isInitialized()) {
+				sendAsyncMessage(keyboardRequest.toString());
+			} else {
+				sendToast("is NOT initialized");
+			}
+
 			break;
 
 		default:
 			break;
 		}
-		// TODO Auto-generated method stub
 
 	}
 
 	/**
-	 * Initialize the component that send messages over the network. 
-	 * Send the message in parameter.
+	 * Initialize the component that send messages over the network. Send the message in parameter.
+	 * 
 	 * @param _message The message to send.
 	 */
-	public void sendAsyncMessage(NetworkMessage _message) {
+	private void sendAsyncMessage(String _message) {
+
 		if (AsyncMessageMgr.availablePermits() > 0) {
-			new AsyncMessageMgr(sToastHandler).execute(_message);
+			sendToast("Sending message...");
+			addMessageToLog(_message);
+			new AsyncMessageMgr(mToastHandler, getHost(), getPort(), getTimeout()).execute(_message);
+
 		} else {
-			Toast.makeText(getApplicationContext(), R.string.msg_no_more_permit, Toast.LENGTH_SHORT).show();
+			sendToast(getString(R.string.msg_no_more_permit));
 		}
+	}
+
+	private void sendToast(String _toastMessage) {
+		Toast.makeText(getApplicationContext(), _toastMessage, LENGTH_SHORT).show();
+	}
+
+	private void addMessageToLog(String _message) {
+		((EditText) findViewById(R.id.etConsole)).getText().append(_message);
+		((EditText) findViewById(R.id.etConsole)).getText().append("___________\n");
+	}
+
+	private String getHost() {
+		return ((EditText) findViewById(R.id.etIpAddress)).getText().toString();
+	}
+
+	private int getPort() {
+		final String portStr = ((EditText) findViewById(R.id.etPort)).getText()
+				.toString();
+		try {
+			return Integer.parseInt(portStr);
+		} catch (NumberFormatException e) {
+			if (BuildConfig.DEBUG) {
+				Log.e(TAG, "getPort" + e.getMessage());
+			}
+			return 0;
+		}
+	}
+
+	private int getTimeout() {
+		final String timeoutStr = ((EditText) findViewById(R.id.etTimeout))
+				.getText().toString();
+		try {
+			return Integer.parseInt(timeoutStr);
+		} catch (NumberFormatException e) {
+			if (BuildConfig.DEBUG) {
+				Log.e(TAG, "getTimeout :" + e.getMessage());
+			}
+			return 500;
+		}
+	}
+
+	private String getTextToSend() {
+		return ((EditText) findViewById(R.id.etTextToSend)).getText().toString();
 	}
 }

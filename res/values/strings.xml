@@ -8,11 +8,15 @@
 	<!-- Home labels -->
 	<string name="host_ip_address">Host IP address</string>
 	<string name="host_port">Host Port</string>
+	<string name="connection_timeout">Timeout</string>
 
 	<!-- Default values -->
 	<string name="default_host_ip_address">192.168.0.1</string>
 	<string name="default_host_port">8082</string>
+	<string name="default_connection_timeout">500</string>
 	
+    <string name="btn_hello">Hello</string>
+    <string name="btn_send">Send</string>
     <string name="msg_no_more_permit">No more permit available !</string>
 
 </resources>

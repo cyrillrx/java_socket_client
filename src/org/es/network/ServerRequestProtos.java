@@ -1467,9 +1467,9 @@ public final class ServerRequestProtos {
     boolean hasEvent();
     org.es.network.ServerRequestProtos.ProtoRequestKeyboard.KeyboardEvent getEvent();
     
-    // optional string character = 2;
-    boolean hasCharacter();
-    String getCharacter();
+    // optional string text = 2;
+    boolean hasText();
+    String getText();
   }
   public static final class ProtoRequestKeyboard extends
       com.google.protobuf.GeneratedMessage
@@ -1612,14 +1612,14 @@ public final class ServerRequestProtos {
       return event_;
     }
     
-    // optional string character = 2;
-    public static final int CHARACTER_FIELD_NUMBER = 2;
-    private java.lang.Object character_;
-    public boolean hasCharacter() {
+    // optional string text = 2;
+    public static final int TEXT_FIELD_NUMBER = 2;
+    private java.lang.Object text_;
+    public boolean hasText() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
-    public String getCharacter() {
-      java.lang.Object ref = character_;
+    public String getText() {
+      java.lang.Object ref = text_;
       if (ref instanceof String) {
         return (String) ref;
       } else {
@@ -1627,17 +1627,17 @@ public final class ServerRequestProtos {
             (com.google.protobuf.ByteString) ref;
         String s = bs.toStringUtf8();
         if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          character_ = s;
+          text_ = s;
         }
         return s;
       }
     }
-    private com.google.protobuf.ByteString getCharacterBytes() {
-      java.lang.Object ref = character_;
+    private com.google.protobuf.ByteString getTextBytes() {
+      java.lang.Object ref = text_;
       if (ref instanceof String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        character_ = b;
+        text_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
@@ -1646,7 +1646,7 @@ public final class ServerRequestProtos {
     
     private void initFields() {
       event_ = org.es.network.ServerRequestProtos.ProtoRequestKeyboard.KeyboardEvent.MEDIA_PLAY_PAUSE;
-      character_ = "";
+      text_ = "";
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -1668,7 +1668,7 @@ public final class ServerRequestProtos {
         output.writeEnum(1, event_.getNumber());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeBytes(2, getCharacterBytes());
+        output.writeBytes(2, getTextBytes());
       }
       getUnknownFields().writeTo(output);
     }
@@ -1685,7 +1685,7 @@ public final class ServerRequestProtos {
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(2, getCharacterBytes());
+          .computeBytesSize(2, getTextBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -1813,7 +1813,7 @@ public final class ServerRequestProtos {
         super.clear();
         event_ = org.es.network.ServerRequestProtos.ProtoRequestKeyboard.KeyboardEvent.MEDIA_PLAY_PAUSE;
         bitField0_ = (bitField0_ & ~0x00000001);
-        character_ = "";
+        text_ = "";
         bitField0_ = (bitField0_ & ~0x00000002);
         return this;
       }
@@ -1860,7 +1860,7 @@ public final class ServerRequestProtos {
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
-        result.character_ = character_;
+        result.text_ = text_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -1880,8 +1880,8 @@ public final class ServerRequestProtos {
         if (other.hasEvent()) {
           setEvent(other.getEvent());
         }
-        if (other.hasCharacter()) {
-          setCharacter(other.getCharacter());
+        if (other.hasText()) {
+          setText(other.getText());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -1931,7 +1931,7 @@ public final class ServerRequestProtos {
             }
             case 18: {
               bitField0_ |= 0x00000002;
-              character_ = input.readBytes();
+              text_ = input.readBytes();
               break;
             }
           }
@@ -1964,39 +1964,39 @@ public final class ServerRequestProtos {
         return this;
       }
       
-      // optional string character = 2;
-      private java.lang.Object character_ = "";
-      public boolean hasCharacter() {
+      // optional string text = 2;
+      private java.lang.Object text_ = "";
+      public boolean hasText() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
-      public String getCharacter() {
-        java.lang.Object ref = character_;
+      public String getText() {
+        java.lang.Object ref = text_;
         if (!(ref instanceof String)) {
           String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-          character_ = s;
+          text_ = s;
           return s;
         } else {
           return (String) ref;
         }
       }
-      public Builder setCharacter(String value) {
+      public Builder setText(String value) {
         if (value == null) {
     throw new NullPointerException();
   }
   bitField0_ |= 0x00000002;
-        character_ = value;
+        text_ = value;
         onChanged();
         return this;
       }
-      public Builder clearCharacter() {
+      public Builder clearText() {
         bitField0_ = (bitField0_ & ~0x00000002);
-        character_ = getDefaultInstance().getCharacter();
+        text_ = getDefaultInstance().getText();
         onChanged();
         return this;
       }
-      void setCharacter(com.google.protobuf.ByteString value) {
+      void setText(com.google.protobuf.ByteString value) {
         bitField0_ |= 0x00000002;
-        character_ = value;
+        text_ = value;
         onChanged();
       }
       
@@ -2018,9 +2018,9 @@ public final class ServerRequestProtos {
     boolean hasParam();
     org.es.network.ServerRequestProtos.ProtoRequestAI.AIParam getParam();
     
-    // optional string sentence = 2;
-    boolean hasSentence();
-    String getSentence();
+    // optional string text = 2;
+    boolean hasText();
+    String getText();
   }
   public static final class ProtoRequestAI extends
       com.google.protobuf.GeneratedMessage
@@ -2130,14 +2130,14 @@ public final class ServerRequestProtos {
       return param_;
     }
     
-    // optional string sentence = 2;
-    public static final int SENTENCE_FIELD_NUMBER = 2;
-    private java.lang.Object sentence_;
-    public boolean hasSentence() {
+    // optional string text = 2;
+    public static final int TEXT_FIELD_NUMBER = 2;
+    private java.lang.Object text_;
+    public boolean hasText() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
-    public String getSentence() {
-      java.lang.Object ref = sentence_;
+    public String getText() {
+      java.lang.Object ref = text_;
       if (ref instanceof String) {
         return (String) ref;
       } else {
@@ -2145,17 +2145,17 @@ public final class ServerRequestProtos {
             (com.google.protobuf.ByteString) ref;
         String s = bs.toStringUtf8();
         if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          sentence_ = s;
+          text_ = s;
         }
         return s;
       }
     }
-    private com.google.protobuf.ByteString getSentenceBytes() {
-      java.lang.Object ref = sentence_;
+    private com.google.protobuf.ByteString getTextBytes() {
+      java.lang.Object ref = text_;
       if (ref instanceof String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        sentence_ = b;
+        text_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
@@ -2164,7 +2164,7 @@ public final class ServerRequestProtos {
     
     private void initFields() {
       param_ = org.es.network.ServerRequestProtos.ProtoRequestAI.AIParam.MUTE;
-      sentence_ = "";
+      text_ = "";
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -2186,7 +2186,7 @@ public final class ServerRequestProtos {
         output.writeEnum(1, param_.getNumber());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeBytes(2, getSentenceBytes());
+        output.writeBytes(2, getTextBytes());
       }
       getUnknownFields().writeTo(output);
     }
@@ -2203,7 +2203,7 @@ public final class ServerRequestProtos {
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(2, getSentenceBytes());
+          .computeBytesSize(2, getTextBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -2331,7 +2331,7 @@ public final class ServerRequestProtos {
         super.clear();
         param_ = org.es.network.ServerRequestProtos.ProtoRequestAI.AIParam.MUTE;
         bitField0_ = (bitField0_ & ~0x00000001);
-        sentence_ = "";
+        text_ = "";
         bitField0_ = (bitField0_ & ~0x00000002);
         return this;
       }
@@ -2378,7 +2378,7 @@ public final class ServerRequestProtos {
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
-        result.sentence_ = sentence_;
+        result.text_ = text_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -2398,8 +2398,8 @@ public final class ServerRequestProtos {
         if (other.hasParam()) {
           setParam(other.getParam());
         }
-        if (other.hasSentence()) {
-          setSentence(other.getSentence());
+        if (other.hasText()) {
+          setText(other.getText());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -2449,7 +2449,7 @@ public final class ServerRequestProtos {
             }
             case 18: {
               bitField0_ |= 0x00000002;
-              sentence_ = input.readBytes();
+              text_ = input.readBytes();
               break;
             }
           }
@@ -2482,39 +2482,39 @@ public final class ServerRequestProtos {
         return this;
       }
       
-      // optional string sentence = 2;
-      private java.lang.Object sentence_ = "";
-      public boolean hasSentence() {
+      // optional string text = 2;
+      private java.lang.Object text_ = "";
+      public boolean hasText() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
-      public String getSentence() {
-        java.lang.Object ref = sentence_;
+      public String getText() {
+        java.lang.Object ref = text_;
         if (!(ref instanceof String)) {
           String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-          sentence_ = s;
+          text_ = s;
           return s;
         } else {
           return (String) ref;
         }
       }
-      public Builder setSentence(String value) {
+      public Builder setText(String value) {
         if (value == null) {
     throw new NullPointerException();
   }
   bitField0_ |= 0x00000002;
-        sentence_ = value;
+        text_ = value;
         onChanged();
         return this;
       }
-      public Builder clearSentence() {
+      public Builder clearText() {
         bitField0_ = (bitField0_ & ~0x00000002);
-        sentence_ = getDefaultInstance().getSentence();
+        text_ = getDefaultInstance().getText();
         onChanged();
         return this;
       }
-      void setSentence(com.google.protobuf.ByteString value) {
+      void setText(com.google.protobuf.ByteString value) {
         bitField0_ |= 0x00000002;
-        sentence_ = value;
+        text_ = value;
         onChanged();
       }
       
@@ -2857,19 +2857,19 @@ public final class ServerRequestProtos {
       "am\030\001 \002(\0162\'.network.ProtoRequestVolume.Vo" +
       "lumeParam\022\022\n\006volume\030\002 \001(\005:\00250\"5\n\013VolumeP" +
       "aram\022\006\n\002UP\020\000\022\010\n\004DOWN\020\001\022\010\n\004MUTE\020\002\022\n\n\006DEFI" +
-      "NE\020\003\"\316\002\n\024ProtoRequestKeyboard\022:\n\005event\030\001" +
+      "NE\020\003\"\311\002\n\024ProtoRequestKeyboard\022:\n\005event\030\001" +
       " \002(\0162+.network.ProtoRequestKeyboard.Keyb" +
-      "oardEvent\022\021\n\tcharacter\030\002 \001(\t\"\346\001\n\rKeyboar" +
-      "dEvent\022\024\n\020MEDIA_PLAY_PAUSE\020\000\022\016\n\nMEDIA_ST" +
-      "OP\020\001\022\022\n\016MEDIA_PREVIOUS\020\002\022\016\n\nMEDIA_NEXT\020\003" +
-      "\022\014\n\010MEDIA_FF\020\004\022\020\n\014MEDIA_REWIND\020\005\022\r\n\tKB_R" +
-      "ETURN\020\006\022\014\n\010KB_SPACE\020\007\022\020\n\014KB_BACKSPACE\020\010\022",
-      "\r\n\tKB_ESCAPE\020\t\022\n\n\006DEFINE\020\n\022\r\n\tKB_ALT_F4\020" +
-      "\013\022\022\n\016KB_CTRL_RETURN\020\014\"p\n\016ProtoRequestAI\022" +
-      ".\n\005param\030\001 \002(\0162\037.network.ProtoRequestAI." +
-      "AIParam\022\020\n\010sentence\030\002 \001(\t\"\034\n\007AIParam\022\010\n\004" +
-      "MUTE\020\000\022\007\n\003SAY\020\001\"\021\n\017ProtoRequestAppB%\n\016or" +
-      "g.es.networkB\023ServerRequestProtos"
+      "oardEvent\022\014\n\004text\030\002 \001(\t\"\346\001\n\rKeyboardEven" +
+      "t\022\024\n\020MEDIA_PLAY_PAUSE\020\000\022\016\n\nMEDIA_STOP\020\001\022" +
+      "\022\n\016MEDIA_PREVIOUS\020\002\022\016\n\nMEDIA_NEXT\020\003\022\014\n\010M" +
+      "EDIA_FF\020\004\022\020\n\014MEDIA_REWIND\020\005\022\r\n\tKB_RETURN" +
+      "\020\006\022\014\n\010KB_SPACE\020\007\022\020\n\014KB_BACKSPACE\020\010\022\r\n\tKB",
+      "_ESCAPE\020\t\022\n\n\006DEFINE\020\n\022\r\n\tKB_ALT_F4\020\013\022\022\n\016" +
+      "KB_CTRL_RETURN\020\014\"l\n\016ProtoRequestAI\022.\n\005pa" +
+      "ram\030\001 \002(\0162\037.network.ProtoRequestAI.AIPar" +
+      "am\022\014\n\004text\030\002 \001(\t\"\034\n\007AIParam\022\010\n\004MUTE\020\000\022\007\n" +
+      "\003SAY\020\001\"\021\n\017ProtoRequestAppB%\n\016org.es.netw" +
+      "orkB\023ServerRequestProtos"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -2905,7 +2905,7 @@ public final class ServerRequestProtos {
           internal_static_network_ProtoRequestKeyboard_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_network_ProtoRequestKeyboard_descriptor,
-              new java.lang.String[] { "Event", "Character", },
+              new java.lang.String[] { "Event", "Text", },
               org.es.network.ServerRequestProtos.ProtoRequestKeyboard.class,
               org.es.network.ServerRequestProtos.ProtoRequestKeyboard.Builder.class);
           internal_static_network_ProtoRequestAI_descriptor =
@@ -2913,7 +2913,7 @@ public final class ServerRequestProtos {
           internal_static_network_ProtoRequestAI_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_network_ProtoRequestAI_descriptor,
-              new java.lang.String[] { "Param", "Sentence", },
+              new java.lang.String[] { "Param", "Text", },
               org.es.network.ServerRequestProtos.ProtoRequestAI.class,
               org.es.network.ServerRequestProtos.ProtoRequestAI.Builder.class);
           internal_static_network_ProtoRequestApp_descriptor =

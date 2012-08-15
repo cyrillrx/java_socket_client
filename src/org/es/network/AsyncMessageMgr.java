@@ -2,7 +2,6 @@ package org.es.network;
 
 import static org.es.socketclient.BuildConfig.DEBUG;
 import static org.es.socketclient.Constants.MESSAGE_WHAT_TOAST;
-import static org.es.network.ServerMessage.CODE_VOLUME;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,43 +11,44 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.concurrent.Semaphore;
 
-import org.es.network.ServerMessage;
-
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
 /**
- * Class that handle asynchronous messages de gestion d'envoi de command avec paramètres au serveur.
- * @author cyril.leroux
+ * Class that handle asynchronous messages to send to the server.
+ * @author Cyril Leroux
  */
-public class AsyncMessageMgr extends AsyncTask<NetworkMessage, int[], String> {
+public class AsyncMessageMgr extends AsyncTask<String, int[], NetworkResponse> {
 	protected static Semaphore sSemaphore = new Semaphore(2);
 	private static final String TAG = "AsyncMessageMgr";
 
-	private static String sHost;
-	private static int sPort;
-	private static int sTimeout;
+	private final String mHost;
+	private final int mPort;
+	private final int mTimeout;
 
-	protected NetworkMessage mRequest;
 	protected NetworkResponse mReply;
 	protected Handler mHandler;
 	private Socket mSocket;
 
 	/**
 	 * Initialize class with the message handler as a parameter.
+	 * 
 	 * @param _handler The handler for toast messages.
+	 * @param _host The remote server IP address.
+	 * @param _port The port on which we want to establish a connection with the remote server.
+	 * @param _timeout The timeout of the connection with the server (in milliseconds).
 	 */
-	public AsyncMessageMgr(Handler _handler) {
-		mHandler = _handler;
+	public AsyncMessageMgr(Handler _handler, String _host, int _port, int _timeout) {
+		mHandler	= _handler;
+		mHost		= _host;
+		mPort		= _port;
+		mTimeout	= _timeout;
+
+		mReply = new NetworkResponse();
 	}
 
-	/**
-	 * Cette fonction est exécutée avant l'appel à {@link #doInBackground(String...)}.<br />
-	 * Elle retient un sémaphore qui sera libéré dans la fonction {@link #onPostExecute(String)}.<br />
-	 * Exécutée dans le thread principal.
-	 */
 	@Override
 	protected void onPreExecute() {
 		try {
@@ -63,20 +63,17 @@ public class AsyncMessageMgr extends AsyncTask<NetworkMessage, int[], String> {
 		}
 	}
 
-	/**
-	 * Cette fonction est exécutée sur un thread différent du thread principal
-	 * @param _params le tableau de string contenant les paramètres (commande et paramètre de la commande).
-	 * @return La réponse du serveur.
-	 */
 	@Override
-	protected String doInBackground(NetworkMessage... _requests) {
-		
-		final String requestMessage	= _requests[0].getMessage();
+	protected NetworkResponse doInBackground(String... _requests) {
+
+		final String requestMessage	= _requests[0];
+
+		mReply.setCommand(requestMessage);
 
 		mSocket = null;
 		try {
 			// Création du socket
-			mSocket = connectToRemoteSocket(sHost, sPort, sTimeout);
+			mSocket = connectToRemoteSocket(mHost, mPort, mTimeout);
 			if (mSocket != null && mSocket.isConnected()) {
 				mReply.setMessage(sendAsyncMessage(mSocket, requestMessage));
 			}
@@ -85,40 +82,34 @@ public class AsyncMessageMgr extends AsyncTask<NetworkMessage, int[], String> {
 			mReply.setReturnCode(ServerMessage.RC_ERROR);
 			mReply.setErrorMessage("IOException" + e.getMessage());
 			if (DEBUG) {
-				Log.e(TAG, mReply.getMessage());
+				Log.e(TAG, e.getMessage());
 			}
 
 		} catch (Exception e) {
 			mReply.setReturnCode(ServerMessage.RC_ERROR);
 			mReply.setErrorMessage("Exception" + e.getMessage());
 			if (DEBUG) {
-				Log.e(TAG, mReply.getMessage());
+				Log.e(TAG, e.getMessage());
 			}
 
 		} finally {
 			closeSocketIO();
 		}
 
-		return mReply.getMessage();
+		return mReply;
 	}
 
-	/**
-	 * Cette fonction est exécutée après l'appel à {@link #doInBackground(String...)}
-	 * Exécutée dans le thread principal.
-	 * @param _serverReply La réponse du serveur renvoyée par la fonction {@link #doInBackground(String...)}.
-	 */
 	@Override
-	protected void onPostExecute(String _serverReply) {
+	protected void onPostExecute(NetworkResponse _serverReply) {
 		if (DEBUG) {
 			Log.i(TAG, "Got a reply : " + _serverReply);
-			Log.i(TAG, "mRequest message  : " + mRequest.getMessage());
 		}
 		sSemaphore.release();
 		if (DEBUG) {
 			Log.i(TAG, "Semaphore release");
 		}
-		
-		showToast(_serverReply);
+
+		showToast(_serverReply.getMessage());
 	}
 
 	@Override
@@ -138,7 +129,7 @@ public class AsyncMessageMgr extends AsyncTask<NetworkMessage, int[], String> {
 			}
 			return;
 		}
-		
+
 		Message msg = new Message();
 		msg.what = MESSAGE_WHAT_TOAST;
 		msg.obj = _toastMessage;
@@ -146,26 +137,27 @@ public class AsyncMessageMgr extends AsyncTask<NetworkMessage, int[], String> {
 	}
 
 	/**
-	 * Fonction de connexion à un socket disant.
-	 * @param _host L'adresse ip de l'hôte auquel est lié le socket.
-	 * @param _port Le numéro de port de l'hôte auquel est lié le socket.
-	 * @param _timeout Timeout of the messages send through the socket.
-	 * @return The socket to connect to the server si la connexion s'est effectuée correctement, false dans les autres cas.
-	 * @throws IOException excteption
+	 * Creates the socket, connects it to the server then returns it.
+	 * 
+	 * @param _host The remote server IP address.
+	 * @param _port The port on which we want to establish a connection with the remote server.
+	 * @param _timeout The timeout of the connection with the server (in milliseconds).
+	 * @return The socket on which to send the message.
+	 * @throws IOException exception
 	 */
 	private Socket connectToRemoteSocket(String _host, int _port, int _timeout) throws IOException {
 
 		final SocketAddress socketAddress = new InetSocketAddress(_host, _port);
 		Socket socket = new Socket();
 		socket.connect(socketAddress, _timeout);
-
 		return socket;
 	}
 
 	/**
-	 * Cette fonction est appelée depuis le thread principal
-	 * Elle permet l'envoi d'une commande et d'un paramètre
-	 * @param _socket The socket on wich to send the message.
+	 * Called from the UI Thread.
+	 * It allows to send a message through a Socket to a server.
+	 * 
+	 * @param _socket The socket on which to send the message.
 	 * @param _message Le message to send.
 	 * @return The server reply.
 	 * @throws IOException exception.
@@ -186,9 +178,9 @@ public class AsyncMessageMgr extends AsyncTask<NetworkMessage, int[], String> {
 	}
 
 	/**
-	 * @param _socket Le socket auquel le message a été envoyé.
-	 * @return La réponse du serveur.
-	 * @throws IOException exeption
+	 * @param _socket The socket on which to send the message.
+	 * @return The server reply.
+	 * @throws IOException exception
 	 */
 	private String getServerReply(Socket _socket) throws IOException {
 		final int BUFSIZ = 512;
@@ -206,9 +198,7 @@ public class AsyncMessageMgr extends AsyncTask<NetworkMessage, int[], String> {
 		return reply;
 	}
 
-	/**
-	 * Ferme les entrées/sortie du socket puis ferme le socket.
-	 */
+	/** Close the socket IO then close the socket. */
 	private void closeSocketIO() {
 		if (mSocket == null) {
 			return;
@@ -227,34 +217,4 @@ public class AsyncMessageMgr extends AsyncTask<NetworkMessage, int[], String> {
 	public static int availablePermits() {
 		return sSemaphore.availablePermits();
 	}
-
-	/** @return Concatenation of host and port of the remote server. */
-	public static String getServerInfos() {
-		return sHost + ":" + sPort;
-	}
-
-	/**
-	 * Set the ip address of the remote server.
-	 * @param _host the ip address of the remote server.
-	 */
-	public static void setHost(String _host) {
-		sHost = _host;
-	}
-
-	/**
-	 * Set the port on which we want to establish a connexion with the remote server.
-	 * @param _port the port value.
-	 */
-	public static void setPort(int _port) {
-		sPort = _port;
-	}
-
-	/**
-	 * Define the timeout of the connexion with the server.
-	 * @param _timeout The timeout in millisecondes.
-	 */
-	public static void setTimeout(int _timeout) {
-		sTimeout = _timeout;
-	}
-
 }
