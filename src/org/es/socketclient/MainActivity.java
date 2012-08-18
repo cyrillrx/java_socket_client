@@ -5,10 +5,9 @@ import static android.widget.Toast.LENGTH_SHORT;
 import static org.es.socketclient.Constants.MESSAGE_WHAT_TOAST;
 
 import org.es.network.AsyncMessageMgr;
-import org.es.network.ServerRequestProtos.ProtoRequestKeyboard;
-import org.es.network.ServerRequestProtos.ProtoRequestKeyboard.KeyboardEvent;
-import org.es.network.ServerRequestProtos.ProtoRequestSimple;
-import org.es.network.ServerRequestProtos.ProtoRequestSimple.SimpleParam;
+import org.es.network.ExchangeProtos.Code;
+import org.es.network.ExchangeProtos.Request;
+import org.es.network.ExchangeProtos.Type;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -32,20 +31,27 @@ public class MainActivity extends Activity implements OnClickListener {
 	private static final String TAG = "SocketClient_MainActivity";
 
 	/** Handle the toast messages. */
-	private final Handler mToastHandler = new Handler() {
-		@Override
-		public void handleMessage(Message _msg) {
-			switch (_msg.what) {
-			case MESSAGE_WHAT_TOAST:
-				sendToast((String) _msg.obj);
-				break;
-			default:
-				break;
-			}
-			super.handleMessage(_msg);
-		}
+	private static Handler sToastHandler;
 
-	};
+	private void initHandler() {
+		if (sToastHandler != null) {
+			return;
+		}
+		sToastHandler = new Handler() {
+			@Override
+			public void handleMessage(Message _msg) {
+				switch (_msg.what) {
+				case MESSAGE_WHAT_TOAST:
+					sendToast((String) _msg.obj);
+					break;
+				default:
+					break;
+				}
+				super.handleMessage(_msg);
+			}
+
+		};
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -54,6 +60,8 @@ public class MainActivity extends Activity implements OnClickListener {
 
 		((Button) findViewById(R.id.btnHello)).setOnClickListener(this);
 		((Button) findViewById(R.id.btnSend)).setOnClickListener(this);
+
+		initHandler();
 	}
 
 	@Override
@@ -66,15 +74,19 @@ public class MainActivity extends Activity implements OnClickListener {
 	public void onClick(View _v) {
 		_v.performHapticFeedback(VIRTUAL_KEY);
 
+		Request.Builder requestBuilder;
+		Request request;
 		switch (_v.getId()) {
 		case R.id.btnHello:
 
-			ProtoRequestSimple simpleRequest = ProtoRequestSimple.newBuilder()
-			.setParam(SimpleParam.HELLO)
-			.build();
+			requestBuilder = Request.newBuilder()
+			.setType(Type.SIMPLE)
+			.setCode(Code.HELLO);
 
-			if (simpleRequest.isInitialized()) {
-				sendAsyncMessage(simpleRequest.toString());
+			request = requestBuilder.build();
+
+			if (request.isInitialized()) {
+				sendAsyncMessage(request.toString());
 			} else {
 				sendToast("is NOT initialized");
 			}
@@ -83,13 +95,15 @@ public class MainActivity extends Activity implements OnClickListener {
 
 		case R.id.btnSend:
 
-			ProtoRequestKeyboard keyboardRequest = ProtoRequestKeyboard.newBuilder()
-			.setEvent(KeyboardEvent.DEFINE)
-			.setText(getTextToSend())
-			.build();
+			requestBuilder = Request.newBuilder()
+			.setType(Type.KEYBOARD)
+			.setCode(Code.DEFINE)
+			.setText("Fuck");
 
-			if (keyboardRequest.isInitialized()) {
-				sendAsyncMessage(keyboardRequest.toString());
+			request = requestBuilder.build();
+
+			if (request.isInitialized()) {
+				sendAsyncMessage(request.toString());
 			} else {
 				sendToast("is NOT initialized");
 			}
@@ -112,7 +126,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		if (AsyncMessageMgr.availablePermits() > 0) {
 			sendToast("Sending message...");
 			addMessageToLog(_message);
-			new AsyncMessageMgr(mToastHandler, getHost(), getPort(), getTimeout()).execute(_message);
+			new AsyncMessageMgr(sToastHandler, getHost(), getPort(), getTimeout()).execute(_message);
 
 		} else {
 			sendToast(getString(R.string.msg_no_more_permit));
@@ -134,7 +148,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	private int getPort() {
 		final String portStr = ((EditText) findViewById(R.id.etPort)).getText()
-				.toString();
+		.toString();
 		try {
 			return Integer.parseInt(portStr);
 		} catch (NumberFormatException e) {
@@ -147,7 +161,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	private int getTimeout() {
 		final String timeoutStr = ((EditText) findViewById(R.id.etTimeout))
-				.getText().toString();
+		.getText().toString();
 		try {
 			return Integer.parseInt(timeoutStr);
 		} catch (NumberFormatException e) {
