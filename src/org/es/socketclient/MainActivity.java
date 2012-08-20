@@ -5,11 +5,12 @@ import static android.widget.Toast.LENGTH_SHORT;
 import static org.es.socketclient.Constants.MESSAGE_WHAT_TOAST;
 
 import org.es.network.AsyncMessageMgr;
-import org.es.network.ExchangeProtos.Code;
 import org.es.network.ExchangeProtos.Request;
-import org.es.network.ExchangeProtos.Type;
+import org.es.network.ExchangeProtos.Request.Code;
+import org.es.network.ExchangeProtos.Request.Type;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -33,7 +34,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	/** Handle the toast messages. */
 	private static Handler sToastHandler;
 
-	private void initHandler() {
+	private static void initHandler(final Context _context) {
 		if (sToastHandler != null) {
 			return;
 		}
@@ -42,7 +43,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			public void handleMessage(Message _msg) {
 				switch (_msg.what) {
 				case MESSAGE_WHAT_TOAST:
-					sendToast((String) _msg.obj);
+					sendToast(_context, (String) _msg.obj);
 					break;
 				default:
 					break;
@@ -61,7 +62,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		((Button) findViewById(R.id.btnHello)).setOnClickListener(this);
 		((Button) findViewById(R.id.btnSend)).setOnClickListener(this);
 
-		initHandler();
+		initHandler(getApplicationContext());
 	}
 
 	@Override
@@ -88,7 +89,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			if (request.isInitialized()) {
 				sendAsyncMessage(request.toString());
 			} else {
-				sendToast("is NOT initialized");
+				sendToast(getApplicationContext(), "is NOT initialized");
 			}
 
 			break;
@@ -98,14 +99,14 @@ public class MainActivity extends Activity implements OnClickListener {
 			requestBuilder = Request.newBuilder()
 			.setType(Type.KEYBOARD)
 			.setCode(Code.DEFINE)
-			.setText("Fuck");
+			.setText(getTextToSend());
 
 			request = requestBuilder.build();
 
 			if (request.isInitialized()) {
 				sendAsyncMessage(request.toString());
 			} else {
-				sendToast("is NOT initialized");
+				sendToast(getApplicationContext(), "is NOT initialized");
 			}
 
 			break;
@@ -124,17 +125,19 @@ public class MainActivity extends Activity implements OnClickListener {
 	private void sendAsyncMessage(String _message) {
 
 		if (AsyncMessageMgr.availablePermits() > 0) {
-			sendToast("Sending message...");
+			sendToast(getApplicationContext(), "Sending message...");
 			addMessageToLog(_message);
 			new AsyncMessageMgr(sToastHandler, getHost(), getPort(), getTimeout()).execute(_message);
 
 		} else {
-			sendToast(getString(R.string.msg_no_more_permit));
+			sendToast(getApplicationContext(), getString(R.string.msg_no_more_permit));
 		}
 	}
 
-	private void sendToast(String _toastMessage) {
-		Toast.makeText(getApplicationContext(), _toastMessage, LENGTH_SHORT).show();
+	private static void sendToast(Context _context, String _toastMessage) {
+		if (_context != null) {
+			Toast.makeText(_context, _toastMessage, LENGTH_SHORT).show();
+		}
 	}
 
 	private void addMessageToLog(String _message) {
@@ -147,8 +150,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	}
 
 	private int getPort() {
-		final String portStr = ((EditText) findViewById(R.id.etPort)).getText()
-		.toString();
+		final String portStr = ((EditText) findViewById(R.id.etPort)).getText().toString();
 		try {
 			return Integer.parseInt(portStr);
 		} catch (NumberFormatException e) {
@@ -161,7 +163,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	private int getTimeout() {
 		final String timeoutStr = ((EditText) findViewById(R.id.etTimeout))
-		.getText().toString();
+				.getText().toString();
 		try {
 			return Integer.parseInt(timeoutStr);
 		} catch (NumberFormatException e) {

@@ -11,6 +11,9 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.concurrent.Semaphore;
 
+import org.es.network.ExchangeProtos.Response;
+import org.es.network.ExchangeProtos.Response.ReturnCode;
+
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
@@ -20,7 +23,7 @@ import android.util.Log;
  * Class that handle asynchronous messages to send to the server.
  * @author Cyril Leroux
  */
-public class AsyncMessageMgr extends AsyncTask<String, int[], NetworkResponse> {
+public class AsyncMessageMgr extends AsyncTask<String, int[], Response> {
 	protected static Semaphore sSemaphore = new Semaphore(2);
 	private static final String TAG = "AsyncMessageMgr";
 
@@ -28,7 +31,6 @@ public class AsyncMessageMgr extends AsyncTask<String, int[], NetworkResponse> {
 	private final int mPort;
 	private final int mTimeout;
 
-	protected NetworkResponse mReply;
 	protected Handler mHandler;
 	private Socket mSocket;
 
@@ -45,8 +47,6 @@ public class AsyncMessageMgr extends AsyncTask<String, int[], NetworkResponse> {
 		mHost		= _host;
 		mPort		= _port;
 		mTimeout	= _timeout;
-
-		mReply = new NetworkResponse();
 	}
 
 	@Override
@@ -64,30 +64,32 @@ public class AsyncMessageMgr extends AsyncTask<String, int[], NetworkResponse> {
 	}
 
 	@Override
-	protected NetworkResponse doInBackground(String... _requests) {
+	protected Response doInBackground(String... _requests) {
 
 		final String requestMessage	= _requests[0];
 
-		mReply.setCommand(requestMessage);
-
+		Response.Builder builder = Response.newBuilder();
+		builder.setReturnCode(ReturnCode.RC_ERROR);
+		
 		mSocket = null;
 		try {
 			// Création du socket
 			mSocket = connectToRemoteSocket(mHost, mPort, mTimeout);
 			if (mSocket != null && mSocket.isConnected()) {
-				mReply.setMessage(sendAsyncMessage(mSocket, requestMessage));
+				builder.setReturnCode(ReturnCode.RC_SUCCESS);
+				builder.setMessage(sendAsyncMessage(mSocket, requestMessage));
+			} else {
+				builder.setMessage("Socket null or not connected");
 			}
 
 		} catch (IOException e) {
-			mReply.setReturnCode(ServerMessage.RC_ERROR);
-			mReply.setErrorMessage("IOException" + e.getMessage());
+			builder.setMessage("IOException" + e.getMessage());
 			if (DEBUG) {
 				Log.e(TAG, e.getMessage());
 			}
 
 		} catch (Exception e) {
-			mReply.setReturnCode(ServerMessage.RC_ERROR);
-			mReply.setErrorMessage("Exception" + e.getMessage());
+			builder.setMessage("Exception" + e.getMessage());
 			if (DEBUG) {
 				Log.e(TAG, e.getMessage());
 			}
@@ -96,11 +98,11 @@ public class AsyncMessageMgr extends AsyncTask<String, int[], NetworkResponse> {
 			closeSocketIO();
 		}
 
-		return mReply;
+		return builder.build();
 	}
 
 	@Override
-	protected void onPostExecute(NetworkResponse _serverReply) {
+	protected void onPostExecute(Response _serverReply) {
 		if (DEBUG) {
 			Log.i(TAG, "Got a reply : " + _serverReply);
 		}
