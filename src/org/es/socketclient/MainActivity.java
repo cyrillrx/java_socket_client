@@ -24,7 +24,6 @@ import android.widget.Toast;
 
 /**
  * Home activity of the SocketClient application.
- * 
  * @author Cyril Leroux
  * 
  */

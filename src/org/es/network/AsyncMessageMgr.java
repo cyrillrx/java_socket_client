@@ -3,9 +3,7 @@ package org.es.network;
 import static org.es.socketclient.BuildConfig.DEBUG;
 import static org.es.socketclient.Constants.MESSAGE_WHAT_TOAST;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
@@ -22,6 +20,7 @@ import android.util.Log;
 /**
  * Class that handle asynchronous messages to send to the server.
  * @author Cyril Leroux
+ * 
  */
 public class AsyncMessageMgr extends AsyncTask<String, int[], Response> {
 	protected static Semaphore sSemaphore = new Semaphore(2);
@@ -67,38 +66,38 @@ public class AsyncMessageMgr extends AsyncTask<String, int[], Response> {
 	protected Response doInBackground(String... _requests) {
 
 		final String requestMessage	= _requests[0];
+		String errorMessage = "";
 
-		Response.Builder builder = Response.newBuilder();
-		builder.setReturnCode(ReturnCode.RC_ERROR);
-		
 		mSocket = null;
 		try {
 			// Création du socket
 			mSocket = connectToRemoteSocket(mHost, mPort, mTimeout);
 			if (mSocket != null && mSocket.isConnected()) {
-				builder.setReturnCode(ReturnCode.RC_SUCCESS);
-				builder.setMessage(sendAsyncMessage(mSocket, requestMessage));
-			} else {
-				builder.setMessage("Socket null or not connected");
-			}
+				return sendAndReceive(mSocket, requestMessage);
+			} 
+
+			errorMessage = "Socket null or not connected";
 
 		} catch (IOException e) {
-			builder.setMessage("IOException" + e.getMessage());
+			errorMessage = "IOException" + e.getMessage();
 			if (DEBUG) {
-				Log.e(TAG, e.getMessage());
+				Log.e(TAG, errorMessage);
 			}
 
 		} catch (Exception e) {
-			builder.setMessage("Exception" + e.getMessage());
+			errorMessage = "Exception" + e.getMessage();
 			if (DEBUG) {
-				Log.e(TAG, e.getMessage());
+				Log.e(TAG, errorMessage);
 			}
 
 		} finally {
 			closeSocketIO();
 		}
 
-		return builder.build();
+		return Response.newBuilder()
+				.setReturnCode(ReturnCode.RC_ERROR)
+				.setMessage(errorMessage)
+				.build();
 	}
 
 	@Override
@@ -157,48 +156,49 @@ public class AsyncMessageMgr extends AsyncTask<String, int[], Response> {
 
 	/**
 	 * Called from the UI Thread.
-	 * It allows to send a message through a Socket to a server.
+	 * Send a message through a Socket to a server and get the reply.
 	 * 
 	 * @param _socket The socket on which to send the message.
 	 * @param _message Le message to send.
 	 * @return The server reply.
 	 * @throws IOException exception.
 	 */
-	private String sendAsyncMessage(Socket _socket, String _message) throws IOException {
+	private Response sendAndReceive(Socket _socket, String _message) throws IOException {
 		if (DEBUG) {
 			Log.i(TAG, "sendMessage: " + _message);
 		}
-		String serverReply = "";
-
-		if (mSocket.isConnected()) {
+		Response reply = null;
+		if (_socket.isConnected()) {
 			_socket.getOutputStream().write(_message.getBytes());
 			_socket.getOutputStream().flush();
 			_socket.shutdownOutput();
-			serverReply = getServerReply(_socket);
+
+			//String serializedReply = getServerReply(_socket);
+			reply = Response.parseFrom(_socket.getInputStream());
 		}
-		return serverReply;
-	}
-
-	/**
-	 * @param _socket The socket on which to send the message.
-	 * @return The server reply.
-	 * @throws IOException exception
-	 */
-	private String getServerReply(Socket _socket) throws IOException {
-		final int BUFSIZ = 512;
-
-		final BufferedReader bufferReader = new BufferedReader(new InputStreamReader(_socket.getInputStream()), BUFSIZ);
-		String line = "", reply = "";
-		while ((line = bufferReader.readLine()) != null) {
-			reply += line;
-		}
-
-		if (DEBUG) {
-			Log.i(TAG, "Got a reply : " + reply);
-		}
-
 		return reply;
 	}
+
+	//	/**
+	//	 * @param _socket The socket on which to send the message.
+	//	 * @return The server reply.
+	//	 * @throws IOException exception
+	//	 */
+	//	private String getServerReply(Socket _socket) throws IOException {
+	//		final int BUFSIZ = 512;
+	//
+	//		final BufferedReader bufferReader = new BufferedReader(new InputStreamReader(_socket.getInputStream()), BUFSIZ);
+	//		String line = "", reply = "";
+	//		while ((line = bufferReader.readLine()) != null) {
+	//			reply += line;
+	//		}
+	//
+	//		if (DEBUG) {
+	//			Log.i(TAG, "Got a reply : " + reply);
+	//		}
+	//
+	//		return reply;
+	//	}
 
 	/** Close the socket IO then close the socket. */
 	private void closeSocketIO() {
@@ -206,13 +206,20 @@ public class AsyncMessageMgr extends AsyncTask<String, int[], Response> {
 			return;
 		}
 
-		try { if (mSocket.getInputStream() != null) {
-			mSocket.getInputStream().close();
-		}	} catch(IOException e) {}
-		try { if (mSocket.getOutputStream() != null) {
-			mSocket.getOutputStream().close();
-		}	} catch(IOException e) {}
-		try { mSocket.close(); } catch(IOException e) {}
+		try { 
+			if (mSocket.getInputStream() != null) {
+				mSocket.getInputStream().close();
+			}
+		} catch(IOException e) {}
+
+		try { 
+			if (mSocket.getOutputStream() != null) {
+				mSocket.getOutputStream().close();
+			}
+		} catch(IOException e) {}
+		try { 
+			mSocket.close();
+		} catch(IOException e) {}
 	}
 
 	/** @return The count of available permits. */
