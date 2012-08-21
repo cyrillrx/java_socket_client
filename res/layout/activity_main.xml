@@ -49,11 +49,22 @@
         android:focusable="false"
         android:inputType="textMultiLine" />
 
-    <Button
-        android:id="@+id/btnHello"
+    <TableRow
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/btn_hello" />
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/btnHello"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_hello" />
+
+        <Button
+            android:id="@+id/btnTest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_test" />
+    </TableRow>
 
     <LinearLayout
         android:layout_width="match_parent"

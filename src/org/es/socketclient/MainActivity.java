@@ -59,6 +59,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		setContentView(R.layout.activity_main);
 
 		((Button) findViewById(R.id.btnHello)).setOnClickListener(this);
+		((Button) findViewById(R.id.btnTest)).setOnClickListener(this);
 		((Button) findViewById(R.id.btnSend)).setOnClickListener(this);
 
 		initHandler(getApplicationContext());
@@ -74,40 +75,49 @@ public class MainActivity extends Activity implements OnClickListener {
 	public void onClick(View _v) {
 		_v.performHapticFeedback(VIRTUAL_KEY);
 
-		Request.Builder requestBuilder;
 		Request request;
 		switch (_v.getId()) {
 		case R.id.btnHello:
 
-			requestBuilder = Request.newBuilder()
+			request = Request.newBuilder()
 			.setType(Type.SIMPLE)
-			.setCode(Code.HELLO);
-
-			request = requestBuilder.build();
+			.setCode(Code.HELLO)
+			.build();
 
 			if (request.isInitialized()) {
 				sendAsyncMessage(request.toString());
 			} else {
 				sendToast(getApplicationContext(), "is NOT initialized");
 			}
+			break;
 
+		case R.id.btnTest:
+
+			request = Request.newBuilder()
+			.setType(Type.SIMPLE)
+			.setCode(Code.TEST)
+			.build();
+
+			if (request.isInitialized()) {
+				sendAsyncMessage(request.toString());
+			} else {
+				sendToast(getApplicationContext(), "is NOT initialized");
+			}
 			break;
 
 		case R.id.btnSend:
 
-			requestBuilder = Request.newBuilder()
+			request = Request.newBuilder()
 			.setType(Type.KEYBOARD)
 			.setCode(Code.DEFINE)
-			.setText(getTextToSend());
-
-			request = requestBuilder.build();
+			.setText(getTextToSend())
+			.build();
 
 			if (request.isInitialized()) {
 				sendAsyncMessage(request.toString());
 			} else {
 				sendToast(getApplicationContext(), "is NOT initialized");
 			}
-
 			break;
 
 		default:
