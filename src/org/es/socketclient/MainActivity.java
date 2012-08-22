@@ -85,7 +85,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			.build();
 
 			if (request.isInitialized()) {
-				sendAsyncMessage(request.toString());
+				sendAsyncMessage(request);
 			} else {
 				sendToast(getApplicationContext(), "is NOT initialized");
 			}
@@ -99,7 +99,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			.build();
 
 			if (request.isInitialized()) {
-				sendAsyncMessage(request.toString());
+				sendAsyncMessage(request);
 			} else {
 				sendToast(getApplicationContext(), "is NOT initialized");
 			}
@@ -114,7 +114,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			.build();
 
 			if (request.isInitialized()) {
-				sendAsyncMessage(request.toString());
+				sendAsyncMessage(request);
 			} else {
 				sendToast(getApplicationContext(), "is NOT initialized");
 			}
@@ -131,12 +131,12 @@ public class MainActivity extends Activity implements OnClickListener {
 	 * 
 	 * @param _message The message to send.
 	 */
-	private void sendAsyncMessage(String _message) {
+	private void sendAsyncMessage(Request _req) {
 
 		if (AsyncMessageMgr.availablePermits() > 0) {
 			sendToast(getApplicationContext(), "Sending message...");
-			addMessageToLog(_message);
-			new AsyncMessageMgr(sToastHandler, getHost(), getPort(), getTimeout()).execute(_message);
+			addMessageToLog(_req.toString());
+			new AsyncMessageMgr(sToastHandler, getHost(), getPort(), getTimeout()).execute(_req);
 
 		} else {
 			sendToast(getApplicationContext(), getString(R.string.msg_no_more_permit));

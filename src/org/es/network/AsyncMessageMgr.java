@@ -9,6 +9,7 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.concurrent.Semaphore;
 
+import org.es.network.ExchangeProtos.Request;
 import org.es.network.ExchangeProtos.Response;
 import org.es.network.ExchangeProtos.Response.ReturnCode;
 
@@ -22,7 +23,7 @@ import android.util.Log;
  * @author Cyril Leroux
  * 
  */
-public class AsyncMessageMgr extends AsyncTask<String, int[], Response> {
+public class AsyncMessageMgr extends AsyncTask<Request, int[], Response> {
 	protected static Semaphore sSemaphore = new Semaphore(2);
 	private static final String TAG = "AsyncMessageMgr";
 
@@ -63,9 +64,9 @@ public class AsyncMessageMgr extends AsyncTask<String, int[], Response> {
 	}
 
 	@Override
-	protected Response doInBackground(String... _requests) {
+	protected Response doInBackground(Request... _requests) {
 
-		final String requestMessage	= _requests[0];
+		final Request request = _requests[0];
 		String errorMessage = "";
 
 		mSocket = null;
@@ -73,8 +74,8 @@ public class AsyncMessageMgr extends AsyncTask<String, int[], Response> {
 			// Création du socket
 			mSocket = connectToRemoteSocket(mHost, mPort, mTimeout);
 			if (mSocket != null && mSocket.isConnected()) {
-				return sendAndReceive(mSocket, requestMessage);
-			} 
+				return sendAndReceive(mSocket, request);
+			}
 
 			errorMessage = "Socket null or not connected";
 
@@ -163,13 +164,13 @@ public class AsyncMessageMgr extends AsyncTask<String, int[], Response> {
 	 * @return The server reply.
 	 * @throws IOException exception.
 	 */
-	private Response sendAndReceive(Socket _socket, String _message) throws IOException {
+	private Response sendAndReceive(Socket _socket, Request _req) throws IOException {
 		if (DEBUG) {
-			Log.i(TAG, "sendMessage: " + _message);
+			Log.i(TAG, "sendMessage: " + _req.toString());
 		}
 		Response reply = null;
 		if (_socket.isConnected()) {
-			_socket.getOutputStream().write(_message.getBytes());
+			_socket.getOutputStream().write(_req.toByteArray());
 			_socket.getOutputStream().flush();
 			_socket.shutdownOutput();
 
@@ -206,18 +207,18 @@ public class AsyncMessageMgr extends AsyncTask<String, int[], Response> {
 			return;
 		}
 
-		try { 
+		try {
 			if (mSocket.getInputStream() != null) {
 				mSocket.getInputStream().close();
 			}
 		} catch(IOException e) {}
 
-		try { 
+		try {
 			if (mSocket.getOutputStream() != null) {
 				mSocket.getOutputStream().close();
 			}
 		} catch(IOException e) {}
-		try { 
+		try {
 			mSocket.close();
 		} catch(IOException e) {}
 	}
