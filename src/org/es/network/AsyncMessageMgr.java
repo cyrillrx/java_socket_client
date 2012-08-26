@@ -160,7 +160,7 @@ public class AsyncMessageMgr extends AsyncTask<Request, int[], Response> {
 	 * Send a message through a Socket to a server and get the reply.
 	 * 
 	 * @param _socket The socket on which to send the message.
-	 * @param _message Le message to send.
+	 * @param _req The request to send.
 	 * @return The server reply.
 	 * @throws IOException exception.
 	 */

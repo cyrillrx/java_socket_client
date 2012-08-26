@@ -60,6 +60,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 		((Button) findViewById(R.id.btnHello)).setOnClickListener(this);
 		((Button) findViewById(R.id.btnTest)).setOnClickListener(this);
+		((Button) findViewById(R.id.btnKill)).setOnClickListener(this);
 		((Button) findViewById(R.id.btnSend)).setOnClickListener(this);
 
 		initHandler(getApplicationContext());
@@ -105,6 +106,20 @@ public class MainActivity extends Activity implements OnClickListener {
 			}
 			break;
 
+		case R.id.btnKill:
+
+			request = Request.newBuilder()
+			.setType(Type.SIMPLE)
+			.setCode(Code.KILL_SERVER)
+			.build();
+
+			if (request.isInitialized()) {
+				sendAsyncMessage(request);
+			} else {
+				sendToast(getApplicationContext(), "is NOT initialized");
+			}
+			break;
+
 		case R.id.btnSend:
 
 			request = Request.newBuilder()
@@ -129,7 +144,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	/**
 	 * Initialize the component that send messages over the network. Send the message in parameter.
 	 * 
-	 * @param _message The message to send.
+	 * @param _req The message to send.
 	 */
 	private void sendAsyncMessage(Request _req) {
 
