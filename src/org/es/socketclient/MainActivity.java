@@ -125,7 +125,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			request = Request.newBuilder()
 			.setType(Type.KEYBOARD)
 			.setCode(Code.DEFINE)
-			.setText(getTextToSend())
+			.setStringParam(getTextToSend())
 			.build();
 
 			if (request.isInitialized()) {
@@ -187,7 +187,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	private int getTimeout() {
 		final String timeoutStr = ((EditText) findViewById(R.id.etTimeout))
-				.getText().toString();
+		.getText().toString();
 		try {
 			return Integer.parseInt(timeoutStr);
 		} catch (NumberFormatException e) {

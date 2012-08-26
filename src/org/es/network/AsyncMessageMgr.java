@@ -153,6 +153,7 @@ public class AsyncMessageMgr extends AsyncTask<Request, int[], Response> {
 		final SocketAddress socketAddress = new InetSocketAddress(_host, _port);
 		Socket socket = new Socket();
 		socket.connect(socketAddress, _timeout);
+
 		return socket;
 	}
 
