@@ -20,6 +20,7 @@ import android.util.Log;
 
 /**
  * Class that handle asynchronous messages to send to the server.
+ * 
  * @author Cyril Leroux
  * 
  */
@@ -71,7 +72,7 @@ public class AsyncMessageMgr extends AsyncTask<Request, int[], Response> {
 
 		mSocket = null;
 		try {
-			// Création du socket
+			// Socket creation
 			mSocket = connectToRemoteSocket(mHost, mPort, mTimeout);
 			if (mSocket != null && mSocket.isConnected()) {
 				return sendAndReceive(mSocket, request);
@@ -96,9 +97,9 @@ public class AsyncMessageMgr extends AsyncTask<Request, int[], Response> {
 		}
 
 		return Response.newBuilder()
-				.setReturnCode(ReturnCode.RC_ERROR)
-				.setMessage(errorMessage)
-				.build();
+		.setReturnCode(ReturnCode.RC_ERROR)
+		.setMessage(errorMessage)
+		.build();
 	}
 
 	@Override
@@ -174,32 +175,10 @@ public class AsyncMessageMgr extends AsyncTask<Request, int[], Response> {
 			_socket.getOutputStream().flush();
 			_socket.shutdownOutput();
 
-			//String serializedReply = getServerReply(_socket);
 			reply = Response.parseFrom(_socket.getInputStream());
 		}
 		return reply;
 	}
-
-	//	/**
-	//	 * @param _socket The socket on which to send the message.
-	//	 * @return The server reply.
-	//	 * @throws IOException exception
-	//	 */
-	//	private String getServerReply(Socket _socket) throws IOException {
-	//		final int BUFSIZ = 512;
-	//
-	//		final BufferedReader bufferReader = new BufferedReader(new InputStreamReader(_socket.getInputStream()), BUFSIZ);
-	//		String line = "", reply = "";
-	//		while ((line = bufferReader.readLine()) != null) {
-	//			reply += line;
-	//		}
-	//
-	//		if (DEBUG) {
-	//			Log.i(TAG, "Got a reply : " + reply);
-	//		}
-	//
-	//		return reply;
-	//	}
 
 	/** Close the socket IO then close the socket. */
 	private void closeSocketIO() {
