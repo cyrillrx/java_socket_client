@@ -8,13 +8,13 @@ import org.es.network.AsyncMessageMgr;
 import org.es.network.ExchangeProtos.Request;
 import org.es.network.ExchangeProtos.Request.Code;
 import org.es.network.ExchangeProtos.Request.Type;
+import org.es.utils.Log;
 
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -175,25 +175,22 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	private int getPort() {
 		final String portStr = ((EditText) findViewById(R.id.etPort)).getText().toString();
+
 		try {
 			return Integer.parseInt(portStr);
 		} catch (NumberFormatException e) {
-			if (BuildConfig.DEBUG) {
-				Log.e(TAG, "getPort" + e.getMessage());
-			}
+			Log.error(TAG, "getPort" + e.getMessage());
 			return 0;
 		}
 	}
 
 	private int getTimeout() {
-		final String timeoutStr = ((EditText) findViewById(R.id.etTimeout))
-		.getText().toString();
+		final String timeoutStr = ((EditText) findViewById(R.id.etTimeout)).getText().toString();
+
 		try {
 			return Integer.parseInt(timeoutStr);
 		} catch (NumberFormatException e) {
-			if (BuildConfig.DEBUG) {
-				Log.e(TAG, "getTimeout :" + e.getMessage());
-			}
+			Log.error(TAG, "getTimeout :" + e.getMessage());
 			return 500;
 		}
 	}

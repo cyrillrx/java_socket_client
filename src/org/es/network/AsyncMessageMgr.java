@@ -1,6 +1,5 @@
 package org.es.network;
 
-import static org.es.socketclient.BuildConfig.DEBUG;
 import static org.es.socketclient.Constants.MESSAGE_WHAT_TOAST;
 
 import java.io.IOException;
@@ -12,11 +11,11 @@ import java.util.concurrent.Semaphore;
 import org.es.network.ExchangeProtos.Request;
 import org.es.network.ExchangeProtos.Response;
 import org.es.network.ExchangeProtos.Response.ReturnCode;
+import org.es.utils.Log;
 
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 
 /**
  * Class that handle asynchronous messages to send to the server.
@@ -55,13 +54,9 @@ public class AsyncMessageMgr extends AsyncTask<Request, int[], Response> {
 		try {
 			sSemaphore.acquire();
 		} catch (InterruptedException e) {
-			if (DEBUG) {
-				Log.e(TAG, "onPreExecute Semaphore acquire error.");
-			}
+			Log.error(TAG, "onPreExecute Semaphore acquire error.");
 		}
-		if (DEBUG) {
-			Log.i(TAG, "onPreExecute Semaphore acquire. " + sSemaphore.availablePermits() + " left");
-		}
+		Log.info(TAG, "onPreExecute Semaphore acquire. " + sSemaphore.availablePermits() + " left");
 	}
 
 	@Override
@@ -81,16 +76,12 @@ public class AsyncMessageMgr extends AsyncTask<Request, int[], Response> {
 			errorMessage = "Socket null or not connected";
 
 		} catch (IOException e) {
-			errorMessage = "IOException" + e.getMessage();
-			if (DEBUG) {
-				Log.e(TAG, errorMessage);
-			}
+			errorMessage = "doInBackground() IOException :" + e.getMessage();
+			Log.error(TAG, errorMessage);
 
 		} catch (Exception e) {
-			errorMessage = "Exception" + e.getMessage();
-			if (DEBUG) {
-				Log.e(TAG, errorMessage);
-			}
+			errorMessage = "doInBackground() Exception :" + e;
+			Log.error(TAG, errorMessage);
 
 		} finally {
 			closeSocketIO();
@@ -104,14 +95,16 @@ public class AsyncMessageMgr extends AsyncTask<Request, int[], Response> {
 
 	@Override
 	protected void onPostExecute(Response _serverReply) {
-		if (DEBUG) {
-			Log.i(TAG, "Got a reply : " + _serverReply);
-		}
 		sSemaphore.release();
-		if (DEBUG) {
-			Log.i(TAG, "Semaphore release");
+
+		Log.info(TAG, "Semaphore release");
+
+		if (_serverReply == null) {
+			Log.error(TAG, "_serverReply == null");
+			return;
 		}
 
+		Log.info(TAG, "Got a reply : " + _serverReply);
 		showToast(_serverReply.getMessage());
 	}
 
@@ -127,9 +120,7 @@ public class AsyncMessageMgr extends AsyncTask<Request, int[], Response> {
 	 */
 	protected void showToast(String _toastMessage) {
 		if (mHandler == null) {
-			if (DEBUG) {
-				Log.i(TAG, "showToast() handler is null");
-			}
+			Log.error(TAG, "showToast() handler is null");
 			return;
 		}
 
@@ -167,18 +158,18 @@ public class AsyncMessageMgr extends AsyncTask<Request, int[], Response> {
 	 * @throws IOException exception.
 	 */
 	private Response sendAndReceive(Socket _socket, Request _req) throws IOException {
-		if (DEBUG) {
-			Log.i(TAG, "sendMessage: " + _req.toString());
-		}
-		Response reply = null;
+		Log.info(TAG, "sendMessage: " + _req.toString());
+
 		if (_socket.isConnected()) {
 			_socket.getOutputStream().write(_req.toByteArray());
 			_socket.getOutputStream().flush();
 			_socket.shutdownOutput();
 
-			reply = Response.parseFrom(_socket.getInputStream());
+			return Response.parseDelimitedFrom(_socket.getInputStream());
+
+
 		}
-		return reply;
+		return null;
 	}
 
 	/** Close the socket IO then close the socket. */
