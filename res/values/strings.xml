@@ -13,6 +13,7 @@
 	<string name="default_host_port">8082</string>
 	<string name="default_connection_timeout">500</string>
 	
+    <string name="btn_explorer">Explorer</string>
     <string name="btn_hello">Hello</string>
     <string name="btn_test">Test</string>
     <string name="btn_kill">Kill</string>

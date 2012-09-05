@@ -2,6 +2,7 @@ package org.es.network;
 
 import static org.es.socketclient.Constants.MESSAGE_WHAT_TOAST;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -93,10 +94,16 @@ public class AsyncMessageMgr extends AsyncTask<Request, int[], Response> {
 		.build();
 	}
 
+	/**
+	 * Runs on the UI thread after {@link #doInBackground(Request...)}.
+	 * The specified result is the value returned by {@link #doInBackground(Request...)}.
+	 * This method won't be invoked if the task was canceled.
+	 * It releases the semaphore acquired in OnPreExecute method.
+	 * @param _serverReply The response from the server returned by {@link #doInBackground(Request...)}.
+	 */
 	@Override
 	protected void onPostExecute(Response _serverReply) {
 		sSemaphore.release();
-
 		Log.info(TAG, "Semaphore release");
 
 		if (_serverReply == null) {
@@ -104,7 +111,7 @@ public class AsyncMessageMgr extends AsyncTask<Request, int[], Response> {
 			return;
 		}
 
-		Log.info(TAG, "Got a reply : " + _serverReply);
+		Log.info(TAG, "Got a reply : " + _serverReply.getMessage());
 		showToast(_serverReply.getMessage());
 	}
 
@@ -161,13 +168,16 @@ public class AsyncMessageMgr extends AsyncTask<Request, int[], Response> {
 		Log.info(TAG, "sendMessage: " + _req.toString());
 
 		if (_socket.isConnected()) {
-			_socket.getOutputStream().write(_req.toByteArray());
+			//create BAOS for protobuf
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			//mClientDetails is a protobuf message object, dump it to the BAOS
+			_req.writeDelimitedTo(baos);
+
+			_socket.getOutputStream().write(baos.toByteArray());
 			_socket.getOutputStream().flush();
 			_socket.shutdownOutput();
 
 			return Response.parseDelimitedFrom(_socket.getInputStream());
-
-
 		}
 		return null;
 	}

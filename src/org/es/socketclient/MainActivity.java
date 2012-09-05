@@ -58,6 +58,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		((Button) findViewById(R.id.btnExplorer)).setOnClickListener(this);
 		((Button) findViewById(R.id.btnHello)).setOnClickListener(this);
 		((Button) findViewById(R.id.btnTest)).setOnClickListener(this);
 		((Button) findViewById(R.id.btnKill)).setOnClickListener(this);
@@ -78,6 +79,21 @@ public class MainActivity extends Activity implements OnClickListener {
 
 		Request request;
 		switch (_v.getId()) {
+		case R.id.btnExplorer:
+
+			request = Request.newBuilder()
+			.setType(Type.EXPLORER)
+			.setCode(Code.GET_FILE_LIST)
+			.setStringParam("L:\\")
+			.build();
+
+			if (request.isInitialized()) {
+				sendAsyncMessage(request);
+			} else {
+				sendToast(getApplicationContext(), "is NOT initialized");
+			}
+			break;
+
 		case R.id.btnHello:
 
 			request = Request.newBuilder()
